@@ -10,8 +10,36 @@ def layer_init(layer, std=np.sqrt(2), bias_const=0.0):
     return layer
 
 class Agent(nn.Module):
+    """
+    The agent takes in a state defined by the following information:
+    1. The healths of everyone in the opponent team
+    2. The healths of everyone in our team
+    3. The ammos of everyone in the opponent team
+    4. The ammos of everyone in our team
+    """
     def __init__(self, envs):
         super().__init__()
+        self.our_health_encoder = nn.Sequential(
+            layer_init(nn.Linear(3, 16)),
+            nn.Tanh(),
+            layer_init(nn.Linear(16, 16)),
+        )
+        self.opp_health_encoder = nn.Sequential(
+            layer_init(nn.Linear(3, 16)),
+            nn.Tanh(),
+            layer_init(nn.Linear(16, 16)),
+        )
+        self.our_ammo_encoder = nn.Sequential(
+            layer_init(nn.Linear(3, 16)),
+            nn.Tanh(),
+            layer_init(nn.Linear(16, 16)),
+        )
+        self.opp_ammo_encoder = nn.Sequential(
+            layer_init(nn.Linear(3, 16)),
+            nn.Tanh(),
+            layer_init(nn.Linear(16, 16)),
+        )
+        
         self.critic = nn.Sequential(
             layer_init(nn.Linear(np.array(envs.single_observation_space.shape).prod(), 64)),
             nn.Tanh(),
