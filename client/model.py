@@ -16,6 +16,16 @@ class Agent(nn.Module):
     2. The healths of everyone in our team
     3. The ammos of everyone in the opponent team
     4. The ammos of everyone in our team
+
+    The actions outputted by the agent is a dictionary of {agent_0: [], agent_1: [], agent_2: []}
+    For each of three friendly agents:
+        List value in dictionary of agent_i is vector of length 7 (with two ones), concatenating the following three
+            One hot action for each agent: [no gun, shoot player 1, player 2, player 3] (i.e. [0, 1, 0, 0])
+            One hot action among: [shield, reload] (either [0, 1] or [1, 0]) 
+               ^ (in the case of shooting one player being the 1 in the above, either of [1 0] or [0 1] 
+                    should result in no shielding or reloading happening)
+            one non-one-hot value of how much ammo is used by agent, such as [7], [0], or [3]
+             ^ assume arbitrary value if agent doesnt shoot
     """
     def __init__(self, envs):
         super().__init__()
@@ -39,7 +49,7 @@ class Agent(nn.Module):
             nn.Tanh(),
             layer_init(nn.Linear(16, 16)),
         )
-        
+
         self.critic = nn.Sequential(
             layer_init(nn.Linear(np.array(envs.single_observation_space.shape).prod(), 64)),
             nn.Tanh(),
